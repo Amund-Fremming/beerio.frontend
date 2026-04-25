@@ -53,13 +53,13 @@ export const api = {
     }),
 
   drink: (room_id: string, username: string, unit_size: number) =>
-    request<PlayerScore>(`/rooms/${room_id}/players/${encodeURIComponent(username)}/drink`, {
+    request<RoomState>(`/rooms/${room_id}/players/${encodeURIComponent(username)}/drink`, {
       method: 'POST',
       body: JSON.stringify({ unit_size }),
     }),
 
   undrink: (room_id: string, username: string, unit_size: number) =>
-    request<PlayerScore>(`/rooms/${room_id}/players/${encodeURIComponent(username)}/drink`, {
+    request<RoomState>(`/rooms/${room_id}/players/${encodeURIComponent(username)}/drink`, {
       method: 'DELETE',
       body: JSON.stringify({ unit_size }),
     }),

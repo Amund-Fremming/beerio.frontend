@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import ErrorBanner from '../components/ErrorBanner'
-import { api, isApiError, type PlayerScore, type RoomState } from '../services/api'
+import { api, isApiError, type RoomState } from '../services/api'
 
 function avatarEmoji(name: string) {
   const emojis = ['🐻', '🦊', '🐺', '🦁', '🐯', '🐸', '🦄', '🐼', '🦋', '🐙']
@@ -64,16 +64,8 @@ export default function RoomScreen() {
     setPendingUndrink(username)
     setDrinkError(null)
     try {
-      const updated: PlayerScore = await api.undrink(roomId, username, drinkSize)
-      setRoom((prev) => {
-        if (!prev) return prev
-        return {
-          ...prev,
-          players: prev.players.map((p) =>
-            p.username === username ? { ...p, score: updated.score } : p,
-          ),
-        }
-      })
+      const updated = await api.undrink(roomId, username, drinkSize)
+      setRoom(updated)
     } catch (err) {
       if (isApiError(err)) {
         setDrinkError(`Failed to remove drink (${err.status}): ${err.message}`)
@@ -90,16 +82,8 @@ export default function RoomScreen() {
     setPendingDrink(username)
     setDrinkError(null)
     try {
-      const updated: PlayerScore = await api.drink(roomId, username, drinkSize)
-      setRoom((prev) => {
-        if (!prev) return prev
-        return {
-          ...prev,
-          players: prev.players.map((p) =>
-            p.username === username ? { ...p, score: updated.score } : p,
-          ),
-        }
-      })
+      const updated = await api.drink(roomId, username, drinkSize)
+      setRoom(updated)
     } catch (err) {
       if (isApiError(err)) {
         setDrinkError(`Failed to add drink (${err.status}): ${err.message}`)
