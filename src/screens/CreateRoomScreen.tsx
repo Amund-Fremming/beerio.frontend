@@ -1,0 +1,87 @@
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { api, isApiError } from '../services/api'
+import ErrorBanner from '../components/ErrorBanner'
+
+const UNIT_SIZES = [0.33, 0.5] as const
+
+export default function CreateRoomScreen() {
+  const navigate = useNavigate()
+  const [unitSize, setUnitSize] = useState<0.33 | 0.5>(0.33)
+  const [unitGoal, setUnitGoal] = useState('10')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    const goal = parseFloat(unitGoal)
+    if (isNaN(goal) || goal <= 0) {
+      setError('Unit goal must be a positive number.')
+      return
+    }
+    setLoading(true)
+    setError(null)
+    try {
+      const { room_id } = await api.createRoom(unitSize, goal)
+      navigate(`/room/${room_id}/join`)
+    } catch (err) {
+      if (isApiError(err)) {
+        setError(`Failed to create room (${err.status}): ${err.message}`)
+      } else {
+        setError('Could not reach the server. Is it running?')
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="screen">
+      <button className="back-link" onClick={() => navigate('/')}>← Back</button>
+
+      <div className="card">
+        <h1 className="screen-title">🆕 Create room</h1>
+        <p className="screen-sub">Set up your drinking game</p>
+      </div>
+
+      <form className="card" style={{ display: 'flex', flexDirection: 'column', gap: 20 }} onSubmit={handleSubmit}>
+        <div className="field">
+          <label>Beer size</label>
+          <div className="segmented">
+            {UNIT_SIZES.map((s) => (
+              <button
+                key={s}
+                type="button"
+                className={unitSize === s ? 'active' : ''}
+                onClick={() => setUnitSize(s)}
+              >
+                🍺 {s}L
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="field">
+          <label>Unit goal</label>
+          <input
+            type="number"
+            min="1"
+            step="0.5"
+            placeholder="e.g. 10"
+            value={unitGoal}
+            onChange={(e) => setUnitGoal(e.target.value)}
+          />
+          <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+            How many units until the game ends
+          </span>
+        </div>
+
+        {error && <ErrorBanner message={error} />}
+
+        <button className="btn btn-primary" type="submit" disabled={loading}>
+          {loading ? <><span className="spinner" />Creating…</> : 'Create room →'}
+        </button>
+      </form>
+    </div>
+  )
+}
