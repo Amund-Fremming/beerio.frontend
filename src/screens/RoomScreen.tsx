@@ -29,6 +29,7 @@ export default function RoomScreen() {
   const [pendingUndrink, setPendingUndrink] = useState<string | null>(null)
   const [drinkError, setDrinkError] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
+  const [showLeaveModal, setShowLeaveModal] = useState(false)
 
   const fetchRoom = useCallback(async () => {
     if (!roomId) return
@@ -117,15 +118,32 @@ export default function RoomScreen() {
 
   return (
     <div className="screen">
+      {/* Leave confirmation modal */}
+      {showLeaveModal && (
+        <div className="modal-overlay" onClick={() => setShowLeaveModal(false)}>
+          <div className="modal-box" onClick={(e) => e.stopPropagation()}>
+            <p className="modal-title">Leave room?</p>
+            <p className="modal-desc">You'll go back to the home page, but you'll stay in the game.</p>
+            <div className="modal-actions">
+              <button className="btn btn-ghost" onClick={() => setShowLeaveModal(false)}>Cancel</button>
+              <button className="btn btn-danger" onClick={() => navigate('/')}>Leave</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="room-topbar">
         <div className="room-code-display">
           <span className="room-code-prefix">ROOM</span>
           <span className="room-code-value">{roomId}</span>
         </div>
-        <button className={`share-pill${copied ? ' copied' : ''}`} onClick={copyLink}>
-          {copied ? '✓ Copied' : '🔗 Share'}
-        </button>
+        <div className="topbar-actions">
+          <button className={`share-pill${copied ? ' copied' : ''}`} onClick={copyLink}>
+            {copied ? '✓ Copied' : '🔗 Share'}
+          </button>
+          <button className="leave-pill" onClick={() => setShowLeaveModal(true)}>🚪 Leave</button>
+        </div>
       </div>
 
       {loadError && <ErrorBanner message={loadError} />}

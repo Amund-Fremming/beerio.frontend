@@ -362,6 +362,92 @@ body {
   box-shadow: 0 0 12px rgba(57, 255, 20, 0.2);
 }
 
+.topbar-actions { display: flex; gap: 8px; align-items: center; }
+
+.leave-pill {
+  background: rgba(255, 45, 120, 0.07);
+  border: 1px solid rgba(255, 45, 120, 0.22);
+  border-radius: 99px;
+  color: var(--red);
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 7px 16px;
+  transition: all var(--transition);
+  white-space: nowrap;
+}
+
+.leave-pill:hover {
+  background: rgba(255, 45, 120, 0.14);
+  border-color: rgba(255, 45, 120, 0.5);
+  box-shadow: 0 0 16px rgba(255, 45, 120, 0.2);
+}
+
+/* ── Modal ── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: fade-in 120ms ease;
+}
+
+.modal-box {
+  background: var(--surface-2);
+  border: 1px solid var(--border-active);
+  border-radius: var(--radius);
+  padding: 28px 24px 22px;
+  max-width: 340px;
+  width: 100%;
+  text-align: center;
+  box-shadow: var(--shadow), var(--shadow-glow);
+}
+
+.modal-title { font-size: 1.1rem; font-weight: 800; margin-bottom: 6px; }
+.modal-desc { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 20px; }
+
+.modal-actions { display: flex; gap: 10px; justify-content: center; }
+
+.btn-ghost {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 10px 22px;
+  transition: all var(--transition);
+}
+
+.btn-ghost:hover { border-color: var(--border-active); color: var(--text); }
+
+.btn-danger {
+  background: rgba(255, 45, 120, 0.15);
+  border: 1px solid rgba(255, 45, 120, 0.4);
+  border-radius: var(--radius-xs);
+  color: var(--red);
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 10px 22px;
+  transition: all var(--transition);
+}
+
+.btn-danger:hover {
+  background: rgba(255, 45, 120, 0.25);
+  border-color: rgba(255, 45, 120, 0.7);
+  box-shadow: 0 0 16px rgba(255, 45, 120, 0.25);
+}
+
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+
 /* ── Size row ── */
 .size-row {
   display: flex;
