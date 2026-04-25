@@ -1,9 +1,7 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { api, isApiError, type RoomState, type PlayerScore } from '../services/api'
 import ErrorBanner from '../components/ErrorBanner'
-
-const UNIT_SIZES = [0.33, 0.5] as const
+import { api, isApiError, type PlayerScore, type RoomState } from '../services/api'
 
 function avatarEmoji(name: string) {
   const emojis = ['🐻', '🦊', '🐺', '🦁', '🐯', '🐸', '🦄', '🐼', '🦋', '🐙']
@@ -28,6 +26,7 @@ export default function RoomScreen() {
   const [loadError, setLoadError] = useState<string | null>(null)
   const [drinkSize, setDrinkSize] = useState<0.33 | 0.5>(0.33)
   const [pendingDrink, setPendingDrink] = useState<string | null>(null)
+  const [pendingUndrink, setPendingUndrink] = useState<string | null>(null)
   const [drinkError, setDrinkError] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
 
@@ -59,6 +58,32 @@ export default function RoomScreen() {
     const interval = setInterval(fetchRoom, 3000)
     return () => clearInterval(interval)
   }, [fetchRoom])
+
+  async function handleUndrink(username: string) {
+    if (!roomId || pendingUndrink) return
+    setPendingUndrink(username)
+    setDrinkError(null)
+    try {
+      const updated: PlayerScore = await api.undrink(roomId, username, drinkSize)
+      setRoom((prev) => {
+        if (!prev) return prev
+        return {
+          ...prev,
+          players: prev.players.map((p) =>
+            p.username === username ? { ...p, score: updated.score } : p,
+          ),
+        }
+      })
+    } catch (err) {
+      if (isApiError(err)) {
+        setDrinkError(`Failed to remove drink (${err.status}): ${err.message}`)
+      } else {
+        setDrinkError('Failed to remove drink. Try again.')
+      }
+    } finally {
+      setPendingUndrink(null)
+    }
+  }
 
   async function handleDrink(username: string) {
     if (!roomId || pendingDrink) return
@@ -109,17 +134,14 @@ export default function RoomScreen() {
   return (
     <div className="screen">
       {/* Header */}
-      <div className="card card-sm">
-        <div className="room-header">
-          <div>
-            <div className="room-id">
-              Room <strong>{roomId}</strong>
-            </div>
-          </div>
-          <button className={`copy-btn${copied ? ' copied' : ''}`} onClick={copyLink}>
-            {copied ? '✓ Copied!' : '🔗 Share link'}
-          </button>
+      <div className="room-topbar">
+        <div className="room-code-display">
+          <span className="room-code-prefix">ROOM</span>
+          <span className="room-code-value">{roomId}</span>
         </div>
+        <button className={`share-pill${copied ? ' copied' : ''}`} onClick={copyLink}>
+          {copied ? '✓ Copied' : '🔗 Share'}
+        </button>
       </div>
 
       {loadError && <ErrorBanner message={loadError} />}
@@ -145,20 +167,28 @@ export default function RoomScreen() {
       )}
 
       {/* Drink size selector */}
-      <div className="card card-sm">
-        <div className="unit-control">
-          <span className="unit-control-label">Add beer size</span>
-          <div className="segmented" style={{ width: 'auto', minWidth: 160 }}>
-            {UNIT_SIZES.map((s) => (
-              <button
-                key={s}
-                className={drinkSize === s ? 'active' : ''}
-                onClick={() => setDrinkSize(s)}
-              >
-                🍺 {s}L
-              </button>
-            ))}
-          </div>
+      <div className="size-row">
+        <span className="size-label">🍺 Beer size</span>
+        <div className="size-toggle">
+          <span
+            className={`size-opt${drinkSize === 0.33 ? ' active' : ''}`}
+            onClick={() => setDrinkSize(0.33)}
+          >
+            0.33L
+          </span>
+          <button
+            className={`toggle-track${drinkSize === 0.5 ? ' on' : ''}`}
+            onClick={() => setDrinkSize(drinkSize === 0.33 ? 0.5 : 0.33)}
+            aria-label="Toggle beer size"
+          >
+            <span className="toggle-thumb" />
+          </button>
+          <span
+            className={`size-opt${drinkSize === 0.5 ? ' active' : ''}`}
+            onClick={() => setDrinkSize(0.5)}
+          >
+            0.5L
+          </span>
         </div>
       </div>
 
@@ -198,10 +228,15 @@ export default function RoomScreen() {
                 <div className="player-actions">
                   <button
                     className="btn-icon minus"
-                    title="Remove drink (not supported by API)"
-                    disabled
+                    title={`Remove ${drinkSize}L`}
+                    disabled={pendingUndrink === player.username}
+                    onClick={() => handleUndrink(player.username)}
                   >
-                    −
+                    {pendingUndrink === player.username ? (
+                      <span className="spinner" style={{ width: 16, height: 16 }} />
+                    ) : (
+                      '−'
+                    )}
                   </button>
                   <button
                     className="btn-icon plus"
@@ -221,27 +256,7 @@ export default function RoomScreen() {
         </div>
       )}
 
-      {/* Invite more */}
-      <div className="card card-sm" style={{ textAlign: 'center' }}>
-        <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-          🎉 Invite friends —{' '}
-          <button
-            onClick={copyLink}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: 'var(--accent)',
-              cursor: 'pointer',
-              font: 'inherit',
-              fontSize: '0.8rem',
-              fontWeight: 600,
-              padding: 0,
-            }}
-          >
-            copy invite link
-          </button>
-        </p>
-      </div>
+
     </div>
   )
 }

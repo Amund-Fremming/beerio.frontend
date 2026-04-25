@@ -8,3 +8,4 @@
 - [ ] needs some selector at top or so to decide what enhet of beer to add 0.33 or 0.5
 - [ ] needs a join screen to join by id
 - [ ] rooms need a copy link fn to pass to freinds to they joun by using the url
+- [ ] make the styling cool moderm, maybe some animations, beer theme, with icons fun and so on!!! Bento mode!!!

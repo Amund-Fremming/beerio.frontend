@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { api, isApiError } from '../services/api'
 import ErrorBanner from '../components/ErrorBanner'
+import { api, isApiError } from '../services/api'
 
 const UNIT_SIZES = [0.33, 0.5] as const
 
@@ -39,14 +39,11 @@ export default function CreateRoomScreen() {
     <div className="screen">
       <button className="back-link" onClick={() => navigate('/')}>← Back</button>
 
-      <div className="card">
-        <h1 className="screen-title">🆕 Create room</h1>
-        <p className="screen-sub">Set up your drinking game</p>
-      </div>
+      <h1 className="screen-title">🆕 Create Room</h1>
 
-      <form className="card" style={{ display: 'flex', flexDirection: 'column', gap: 20 }} onSubmit={handleSubmit}>
+      <form className="card" style={{ display: 'flex', flexDirection: 'column', gap: 20, marginTop: 'auto', marginBottom: 'auto' }} onSubmit={handleSubmit}>
         <div className="field">
-          <label>Beer size</label>
+          <label>Unit size</label>
           <div className="segmented">
             {UNIT_SIZES.map((s) => (
               <button
