@@ -1,6 +1,16 @@
-import { Link } from 'react-router-dom'
+import { useEffect } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 
 export default function HomeScreen() {
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    const activeRoom = localStorage.getItem('beerio_active_room')
+    if (activeRoom) {
+      navigate(`/room/${activeRoom}`, { replace: true })
+    }
+  }, [navigate])
+
   return (
     <div className="screen" style={{ justifyContent: 'center', minHeight: '100svh' }}>
       <div className="wordmark" style={{ marginBottom: 4 }}>

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { api, isApiError } from '../services/api'
 import ErrorBanner from '../components/ErrorBanner'
+import { api, isApiError } from '../services/api'
 
 export default function UsernameScreen() {
   const { roomId } = useParams<{ roomId: string }>()
@@ -18,7 +18,8 @@ export default function UsernameScreen() {
     setError(null)
     try {
       await api.joinRoom(roomId, name)
-      sessionStorage.setItem(`beerio_username_${roomId}`, name)
+      localStorage.setItem(`beerio_username_${roomId}`, name)
+      localStorage.setItem('beerio_active_room', roomId)
       navigate(`/room/${roomId}`, { replace: true })
     } catch (err) {
       if (isApiError(err) && err.status === 400) {

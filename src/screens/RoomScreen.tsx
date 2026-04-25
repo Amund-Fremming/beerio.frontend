@@ -20,7 +20,7 @@ export default function RoomScreen() {
   const { roomId } = useParams<{ roomId: string }>()
   const navigate = useNavigate()
 
-  const myUsername = roomId ? sessionStorage.getItem(`beerio_username_${roomId}`) : null
+  const myUsername = roomId ? localStorage.getItem(`beerio_username_${roomId}`) : null
 
   const [room, setRoom] = useState<RoomState | null>(null)
   const [loadError, setLoadError] = useState<string | null>(null)
@@ -51,6 +51,9 @@ export default function RoomScreen() {
     if (!myUsername && roomId) {
       navigate(`/room/${roomId}/join`, { replace: true })
     }
+    if (myUsername && roomId) {
+      localStorage.setItem('beerio_active_room', roomId)
+    }
   }, [myUsername, roomId, navigate])
 
   // Initial load + polling
@@ -62,6 +65,8 @@ export default function RoomScreen() {
 
   async function handleUndrink(username: string) {
     if (!roomId || pendingUndrink) return
+    const player = room?.players.find((p) => p.username === username)
+    if (!player || player.score <= 0) return
     setPendingUndrink(username)
     setDrinkError(null)
     try {
@@ -126,7 +131,7 @@ export default function RoomScreen() {
             <p className="modal-desc">You'll go back to the home page, but you'll stay in the game.</p>
             <div className="modal-actions">
               <button className="btn btn-ghost" onClick={() => setShowLeaveModal(false)}>Cancel</button>
-              <button className="btn btn-danger" onClick={() => navigate('/')}>Leave</button>
+              <button className="btn btn-danger" onClick={() => { localStorage.removeItem('beerio_active_room'); navigate('/'); }}>Leave</button>
             </div>
           </div>
         </div>
