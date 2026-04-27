@@ -1,11 +1,11 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import { I18nProvider } from './i18n'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import MobileGate from './components/MobileGate'
-import HomeScreen from './screens/HomeScreen'
+import { I18nProvider } from './i18n'
 import CreateRoomScreen from './screens/CreateRoomScreen'
+import HomeScreen from './screens/HomeScreen'
 import JoinRoomScreen from './screens/JoinRoomScreen'
-import UsernameScreen from './screens/UsernameScreen'
 import RoomScreen from './screens/RoomScreen'
+import UsernameScreen from './screens/UsernameScreen'
 
 function App() {
   return (

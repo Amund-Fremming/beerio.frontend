@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import ErrorBanner from '../components/ErrorBanner'
-import { api, isApiError, type RoomState } from '../services/api'
 import { useI18n } from '../i18n'
+import { api, isApiError, type RoomState } from '../services/api'
 
 function avatarEmoji(name: string) {
   const emojis = ['🐻', '🦊', '🐺', '🦁', '🐯', '🐸', '🦄', '🐼', '🦋', '🐙']

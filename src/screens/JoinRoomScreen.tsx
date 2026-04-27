@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import ErrorBanner from '../components/ErrorBanner'
-import { api, isApiError } from '../services/api'
 import { useI18n } from '../i18n'
+import { api, isApiError } from '../services/api'
 
 export default function JoinRoomScreen() {
   const navigate = useNavigate()
