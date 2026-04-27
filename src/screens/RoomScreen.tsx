@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import ErrorBanner from '../components/ErrorBanner'
 import { api, isApiError, type RoomState } from '../services/api'
+import { useI18n } from '../i18n'
 
 function avatarEmoji(name: string) {
   const emojis = ['🐻', '🦊', '🐺', '🦁', '🐯', '🐸', '🦄', '🐼', '🦋', '🐙']
@@ -19,6 +20,7 @@ function formatScore(score: number, unitSize: number) {
 export default function RoomScreen() {
   const { roomId } = useParams<{ roomId: string }>()
   const navigate = useNavigate()
+  const { t } = useI18n()
 
   const myUsername = roomId ? localStorage.getItem(`beerio_username_${roomId}`) : null
 
@@ -39,9 +41,9 @@ export default function RoomScreen() {
       setLoadError(null)
     } catch (err) {
       if (isApiError(err) && err.status === 404) {
-        setLoadError('Room not found.')
+        setLoadError(t.roomNotFound)
       } else {
-        setLoadError('Lost connection to server.')
+        setLoadError(t.lostConnection)
       }
     }
   }, [roomId])
@@ -74,9 +76,9 @@ export default function RoomScreen() {
       setRoom(updated)
     } catch (err) {
       if (isApiError(err)) {
-        setDrinkError(`Failed to remove drink (${err.status}): ${err.message}`)
+        setDrinkError(`${t.failedUndrink} (${err.status}): ${err.message}`)
       } else {
-        setDrinkError('Failed to remove drink. Try again.')
+        setDrinkError(t.failedUndrink)
       }
     } finally {
       setPendingUndrink(null)
@@ -92,9 +94,9 @@ export default function RoomScreen() {
       setRoom(updated)
     } catch (err) {
       if (isApiError(err)) {
-        setDrinkError(`Failed to add drink (${err.status}): ${err.message}`)
+        setDrinkError(`${t.failedDrink} (${err.status}): ${err.message}`)
       } else {
-        setDrinkError('Failed to add drink. Try again.')
+        setDrinkError(t.failedDrink)
       }
     } finally {
       setPendingDrink(null)
@@ -127,11 +129,11 @@ export default function RoomScreen() {
       {showLeaveModal && (
         <div className="modal-overlay" onClick={() => setShowLeaveModal(false)}>
           <div className="modal-box" onClick={(e) => e.stopPropagation()}>
-            <p className="modal-title">Leave room?</p>
-            <p className="modal-desc">You'll go back to the home page, but you'll stay in the game.</p>
+            <p className="modal-title">{t.leaveRoom}</p>
+            <p className="modal-desc">{t.leaveDesc}</p>
             <div className="modal-actions">
-              <button className="btn btn-ghost" onClick={() => setShowLeaveModal(false)}>Cancel</button>
-              <button className="btn btn-danger" onClick={() => { localStorage.removeItem('beerio_active_room'); navigate('/'); }}>Leave</button>
+              <button className="btn btn-ghost" onClick={() => setShowLeaveModal(false)}>{t.cancel}</button>
+              <button className="btn btn-danger" onClick={() => { localStorage.removeItem('beerio_active_room'); navigate('/'); }}>{t.leaveBtn}</button>
             </div>
           </div>
         </div>
@@ -140,14 +142,14 @@ export default function RoomScreen() {
       {/* Header */}
       <div className="room-topbar">
         <div className="room-code-display">
-          <span className="room-code-prefix">ROOM</span>
+          <span className="room-code-prefix">{t.room}</span>
           <span className="room-code-value">{roomId}</span>
         </div>
         <div className="topbar-actions">
           <button className={`share-pill${copied ? ' copied' : ''}`} onClick={copyLink}>
-            {copied ? '✓ Copied' : '🔗 Share'}
+            {copied ? t.copied : t.share}
           </button>
-          <button className="leave-pill" onClick={() => setShowLeaveModal(true)}>🚪 Leave</button>
+          <button className="leave-pill" onClick={() => setShowLeaveModal(true)}>{t.leave}</button>
         </div>
       </div>
 
@@ -158,9 +160,9 @@ export default function RoomScreen() {
         <div className="card card-sm">
           <div className="progress-wrap">
             <div className="progress-label">
-              <span>🏆 Goal progress</span>
+              <span>{t.goalProgress}</span>
               <span>
-                {topScore.toFixed(2)} / {room.unit_goal} units
+                {topScore.toFixed(2)} / {room.unit_goal} {t.units}
               </span>
             </div>
             <div className="progress-bar">
@@ -175,7 +177,7 @@ export default function RoomScreen() {
 
       {/* Drink size selector */}
       <div className="size-row">
-        <span className="size-label">🍺 Beer size</span>
+        <span className="size-label">{t.beerSize}</span>
         <div className="size-toggle">
           <span
             className={`size-opt${drinkSize === 0.33 ? ' active' : ''}`}
@@ -207,7 +209,7 @@ export default function RoomScreen() {
           {room.players.length === 0 && (
             <div className="empty-state">
               <span className="icon">🍺</span>
-              No players yet — share the link!
+              {t.noPlayers}
             </div>
           )}
           {[...room.players]
@@ -224,7 +226,7 @@ export default function RoomScreen() {
                   <div className="player-name">
                     {idx === 0 && room.players.length > 1 ? '👑 ' : ''}
                     {player.username}
-                    {player.username === myUsername && <span className="you-badge">YOU</span>}
+                    {player.username === myUsername && <span className="you-badge">{t.you}</span>}
                   </div>
                   <div className="player-score">
                     <strong>{player.score.toFixed(2)}</strong>{' '}

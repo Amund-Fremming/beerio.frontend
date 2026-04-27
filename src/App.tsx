@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { I18nProvider } from './i18n'
 import MobileGate from './components/MobileGate'
 import HomeScreen from './screens/HomeScreen'
 import CreateRoomScreen from './screens/CreateRoomScreen'
@@ -8,6 +9,7 @@ import RoomScreen from './screens/RoomScreen'
 
 function App() {
   return (
+    <I18nProvider>
     <MobileGate>
     <BrowserRouter>
       <Routes>
@@ -19,6 +21,7 @@ function App() {
       </Routes>
     </BrowserRouter>
     </MobileGate>
+    </I18nProvider>
   )
 }
 

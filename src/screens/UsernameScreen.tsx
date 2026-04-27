@@ -2,10 +2,12 @@ import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import ErrorBanner from '../components/ErrorBanner'
 import { api, isApiError } from '../services/api'
+import { useI18n } from '../i18n'
 
 export default function UsernameScreen() {
   const { roomId } = useParams<{ roomId: string }>()
   const navigate = useNavigate()
+  const { t } = useI18n()
   const [username, setUsername] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -23,13 +25,13 @@ export default function UsernameScreen() {
       navigate(`/room/${roomId}`, { replace: true })
     } catch (err) {
       if (isApiError(err) && err.status === 400) {
-        setError('That name is already taken in this room. Pick another.')
+        setError(t.nameTaken)
       } else if (isApiError(err) && err.status === 404) {
-        setError('Room not found.')
+        setError(t.roomNotFound)
       } else if (isApiError(err)) {
         setError(`Error ${err.status}: ${err.message}`)
       } else {
-        setError('Could not reach the server. Is it running?')
+        setError(t.serverDown)
       }
     } finally {
       setLoading(false)
@@ -39,18 +41,18 @@ export default function UsernameScreen() {
   return (
     <div className="screen">
       <div className="card">
-        <h1 className="screen-title">👋 What's your name?</h1>
+        <h1 className="screen-title">{t.whatsYourName}</h1>
         <p className="screen-sub">
-          Joining room <strong style={{ color: 'var(--accent)' }}>{roomId}</strong>
+          {t.joiningRoom} <strong style={{ color: 'var(--accent)' }}>{roomId}</strong>
         </p>
       </div>
 
       <form className="card" style={{ display: 'flex', flexDirection: 'column', gap: 20 }} onSubmit={handleSubmit}>
         <div className="field">
-          <label>Your name</label>
+          <label>{t.yourName}</label>
           <input
             type="text"
-            placeholder="e.g. Alice"
+            placeholder={t.namePlaceholder}
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             autoFocus
@@ -61,7 +63,7 @@ export default function UsernameScreen() {
         {error && <ErrorBanner message={error} />}
 
         <button className="btn btn-primary" type="submit" disabled={loading || !username.trim()}>
-          {loading ? <><span className="spinner" />Joining…</> : 'Let\'s drink! 🍺'}
+          {loading ? <><span className="spinner" />{t.joining}</> : t.letsDrink}
         </button>
       </form>
     </div>
